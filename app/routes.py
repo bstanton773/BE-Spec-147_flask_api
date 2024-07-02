@@ -1,9 +1,10 @@
 from app import app # from the app folder, import the app variable (Flask instance)
 from flask import request
 from app.schemas.customerSchema import customer_input_schema, customer_output_schema, customers_schema
+from app.schemas.productSchema import product_schema, products_schema
 from marshmallow import ValidationError
 from app.database import db
-from app.models import Customer
+from app.models import Customer, Product
 from werkzeug.security import generate_password_hash
 
 @app.route('/')
@@ -65,3 +66,23 @@ def create_customer():
     except ValueError as err:
         return {"error": str(err)}, 400
 
+
+
+# Product Endpoints 
+
+# Get all products
+@app.route('/products', methods=["GET"])
+def get_all_products():
+    query = db.select(Product)
+    products = db.session.scalars(query).all()
+    return products_schema.jsonify(products)   
+
+# Get a single product by ID
+@app.route('/products/<int:product_id>', methods=["GET"])
+def get_single_product(product_id):
+    # Search the database for a product with that ID
+    product = db.session.get(Product, product_id)
+    # Check if we get a customer back or None
+    if product is not None:
+        return product_schema.jsonify(product)
+    return {"error": f"Product with ID {product_id} does not exist"}, 404 # Not Found
