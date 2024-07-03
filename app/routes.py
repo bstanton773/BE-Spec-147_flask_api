@@ -16,7 +16,12 @@ def index():
 # Get all customers
 @app.route('/customers', methods=['GET'])
 def get_all_customers():
-    query = db.select(Customer)
+    # Get the query parameters from the request
+    args = request.args
+    page = args.get('page', 1, type=int)
+    per_page = args.get('per_page', 10, type=int)
+    search = args.get('search', '')
+    query = db.select(Customer).where(Customer.username.like(f'%{search}%')).limit(per_page).offset((page-1)*per_page)
     customers = db.session.scalars(query).all()
     return customers_schema.jsonify(customers)
 
@@ -77,10 +82,11 @@ def get_all_products():
     args = request.args
     page = args.get('page', 1, type=int)
     per_page = args.get('per_page', 10, type=int)
+    search = args.get('search', '')
     # Query the database for products and limit and offset based on the query params
-    query = db.select(Product).limit(per_page).offset((page-1)*per_page)
+    query = db.select(Product).where(Product.name.like(f'%{search}%')).limit(per_page).offset((page-1)*per_page)
     products = db.session.scalars(query).all()
-    return products_schema.jsonify(products)   
+    return products_schema.jsonify(products)
 
 # Get a single product by ID
 @app.route('/products/<int:product_id>', methods=["GET"])
