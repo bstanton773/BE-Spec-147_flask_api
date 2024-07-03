@@ -7,6 +7,7 @@ from app.database import db
 from app.models import Customer, Product
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.util import encode_token
+from app.auth import token_auth
 
 @app.route('/')
 def index():
@@ -125,7 +126,10 @@ def get_single_product(product_id):
 
 # Create a new product and store in db
 @app.route('/products', methods=["POST"])
+@token_auth.login_required
 def create_product():
+    logged_in_user = token_auth.current_user()
+    print(f'{logged_in_user} is creating a new product')
     # Check if the request has a JSON body
     if not request.is_json:
         return {"error": "Request body must be application/json"}, 400 # Bad Request by Client
