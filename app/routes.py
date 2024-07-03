@@ -1,15 +1,40 @@
 from app import app # from the app folder, import the app variable (Flask instance)
 from flask import request
-from app.schemas.customerSchema import customer_input_schema, customer_output_schema, customers_schema
+from app.schemas.customerSchema import customer_input_schema, customer_output_schema, customers_schema, customer_login_schema
 from app.schemas.productSchema import product_schema, products_schema
 from marshmallow import ValidationError
 from app.database import db
 from app.models import Customer, Product
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.utils.util import encode_token
 
 @app.route('/')
 def index():
     return 'Goodbye'
+
+
+# Token Route
+@app.route('/token', methods=["POST"])
+def get_token():
+    if not request.is_json:
+        return {"error": "Request body must be application/json"}, 400 # Bad Request by Client
+    try:
+        # Verify the request data
+        data = request.json
+        credentials = customer_login_schema.load(data)
+        # Query the customer table for a customer with that username
+        query = db.select(Customer).where(Customer.username==credentials['username'])
+        customer = db.session.scalars(query).first()
+        # If is is a customer and the customer's password matches the credentials
+        if customer is not None and check_password_hash(customer.password, credentials['password']):
+            # Generate a token with the customer's id
+            auth_token = encode_token(customer.id)
+            return {'token': auth_token}, 200
+        # If either the customer with that username does not exist or the password is wrong
+        else:
+            return {"error": "Username and/or password is incorrect"}, 401 # Unauthorized
+    except ValidationError as err:
+        return err.messages, 400
 
 # Customer Routes
 
