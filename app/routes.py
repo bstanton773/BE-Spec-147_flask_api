@@ -86,3 +86,23 @@ def get_single_product(product_id):
     if product is not None:
         return product_schema.jsonify(product)
     return {"error": f"Product with ID {product_id} does not exist"}, 404 # Not Found
+
+# Create a new product and store in db
+@app.route('/products', methods=["POST"])
+def create_product():
+    # Check if the request has a JSON body
+    if not request.is_json:
+        return {"error": "Request body must be application/json"}, 400 # Bad Request by Client
+    try:
+        # Get the JSON body from the request
+        raw_data = request.json
+        # Validate the data using our product schema
+        product_data = product_schema.load(raw_data)
+        # Create a new instance of the Product class
+        new_product = Product(name=product_data['name'], price=product_data['price'])
+        # Add the new product to the database
+        db.session.add(new_product)
+        db.session.commit()
+        return product_schema.jsonify(new_product), 201 # Created
+    except ValidationError as err:
+        return err.messages, 400 # Bad Request by client
