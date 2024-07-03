@@ -2,6 +2,8 @@ alembic==1.13.2
 blinker==1.8.2
 click==8.1.7
 colorama==0.4.6
+Faker==26.0.0
+faker-commerce==1.0.4
 Flask==3.0.3
 flask-marshmallow==1.2.1
 Flask-Migrate==4.0.7
@@ -14,7 +16,9 @@ MarkupSafe==2.1.5
 marshmallow==3.21.3
 marshmallow-sqlalchemy==1.0.0
 packaging==24.1
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+six==1.16.0
 SQLAlchemy==2.0.31
 typing_extensions==4.12.2
 Werkzeug==3.0.3

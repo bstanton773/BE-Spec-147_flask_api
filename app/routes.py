@@ -73,7 +73,12 @@ def create_customer():
 # Get all products
 @app.route('/products', methods=["GET"])
 def get_all_products():
-    query = db.select(Product)
+    # Get any request query params aka request.args
+    args = request.args
+    page = args.get('page', 1, type=int)
+    per_page = args.get('per_page', 10, type=int)
+    # Query the database for products and limit and offset based on the query params
+    query = db.select(Product).limit(per_page).offset((page-1)*per_page)
     products = db.session.scalars(query).all()
     return products_schema.jsonify(products)   
 
