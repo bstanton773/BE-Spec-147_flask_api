@@ -1,5 +1,5 @@
 from app import app, db, limiter, cache # from the app folder, import the app variable (Flask instance)
-from flask import request
+from flask import request, redirect, url_for
 from app.schemas.customerSchema import customer_input_schema, customer_output_schema, customers_schema, customer_login_schema
 from app.schemas.productSchema import product_schema, products_schema
 from marshmallow import ValidationError
@@ -11,7 +11,7 @@ from app.auth import token_auth
 
 @app.route('/')
 def index():
-    return 'Goodbye'
+    return redirect(url_for('swagger_ui.show'))
 
 
 # Token Route
