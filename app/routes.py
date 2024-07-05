@@ -1,13 +1,13 @@
-from app import app # from the app folder, import the app variable (Flask instance)
+from app import app, db, limiter, cache # from the app folder, import the app variable (Flask instance)
 from flask import request
 from app.schemas.customerSchema import customer_input_schema, customer_output_schema, customers_schema, customer_login_schema
 from app.schemas.productSchema import product_schema, products_schema
 from marshmallow import ValidationError
-from app.database import db
 from app.models import Customer, Product
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.util import encode_token
 from app.auth import token_auth
+
 
 @app.route('/')
 def index():
@@ -41,8 +41,10 @@ def get_token():
 
 # Get all customers
 @app.route('/customers', methods=['GET'])
+@cache.cached(timeout=60)
 def get_all_customers():
     # Get the query parameters from the request
+    # print('This get_all_customers function is running')
     args = request.args
     page = args.get('page', 1, type=int)
     per_page = args.get('per_page', 10, type=int)
@@ -103,6 +105,7 @@ def create_customer():
 
 # Get all products
 @app.route('/products', methods=["GET"])
+@limiter.limit("50 per hour")
 def get_all_products():
     # Get any request query params aka request.args
     args = request.args

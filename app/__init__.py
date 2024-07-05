@@ -1,6 +1,8 @@
 import os
 from flask import Flask # Import the Flask class from the flask library
 from app.database import db, migrate # Import the instance of SQLAlchemy (db) and instance of Migrate (migrate) from database module
+from app.limiter import limiter
+from app.caching import cache
 
 
 # Create an instance of the flask application
@@ -13,6 +15,12 @@ db.init_app(app)
 
 # Initialize the app and db with migrate
 migrate.init_app(app, db)
+
+# Initialize the app with flask-limiter
+limiter.init_app(app)
+
+# Initialize the app with flask-caching
+cache.init_app(app)
 
 # Import the routes file so that it runs
 from . import routes, models
