@@ -9,6 +9,8 @@ class Customer(db.Model):
     username: Mapped[str] = mapped_column(db.String(255), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(db.String(255), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(db.String(255), nullable=False)
+    role_id: Mapped[int] = mapped_column(db.ForeignKey('role.id'), default=1, nullable=True)
+    role: Mapped["Role"] = db.relationship(back_populates='customers')
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
