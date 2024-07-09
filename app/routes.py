@@ -129,7 +129,7 @@ def get_single_product(product_id):
 
 # Create a new product and store in db
 @app.route('/products', methods=["POST"])
-@token_auth.login_required
+@token_auth.login_required(role='seller')
 def create_product():
     logged_in_user = token_auth.current_user()
     print(f'{logged_in_user} is creating a new product')

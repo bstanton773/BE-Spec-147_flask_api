@@ -1,6 +1,6 @@
 from flask_httpauth import HTTPTokenAuth
 from app.utils.util import decode_token
-from app.models import Customer
+from app.models import Customer, Role
 from app.database import db
 
 
@@ -22,3 +22,11 @@ def verify(token):
 @token_auth.error_handler
 def handle_error(status_code):
     return {"error": "Invalid token. Please try again"}, status_code
+
+
+@token_auth.get_user_roles
+def get_roles(customer):
+    if customer.role.role_name == 'admin':
+        return [role.role_name for role in db.session.scalars(db.select(Role))]
+    else:
+        return [customer.role.role_name]
