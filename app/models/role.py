@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from typing import List
 
 
-CUSTOMER_ROLES = [(1, "admin"), (2, 'Buyer'), (3, 'Seller')]
+CUSTOMER_ROLES = [(1, "admin"), (2, 'buyer'), (3, 'seller')]
 
 
 class Role(db.Model):
